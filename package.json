@@ -28,6 +28,7 @@
     "test": "xo && vitest run && tsc",
     "test:upload": "eval $(cat .env) node test/live-test.js",
     "upload": "npm run bundle && npm run test:upload",
+    "test:bundle": "npm run build && node ./dist/testar.js",
     "----------------------------------": "----------------------------------",
     "key-getter": "npm run build && node ./dist/key-getter.js",
     "key-getter:dev": "npm run build && node ./dist/key-getter.js --dev",
@@ -59,7 +60,7 @@
     "space": 4
   },
   "devDependencies": {
-    "@clack/prompts": "^0.7.0",
+    "@clack/prompts": "^0.10.1",
     "@sindresorhus/tsconfig": "^5.0.0",
     "@types/node": "^20.11.19",
     "@types/open": "^6.2.1",
@@ -80,9 +81,9 @@
     "node": ">=18"
   },
   "dependencies": {
-    "chrome-webstore-upload-keys": "file:",
     "dotenv": "^16.5.0",
-    "publicador-extensao": "file:"
+    "publicador-extensao": "file:",
+    "web-ext": "^8.6.0"
   },
   "webExt": {
     "sourceDir": "test/extension"
