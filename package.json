@@ -1,5 +1,5 @@
 {
-  "name": "chrome-webstore-upload-keys",
+  "name": "publicador-extensao",
   "version": "1.1.5",
   "description": "CLI tool to generate OAuth keys for the Chrome Web Store",
   "keywords": [
@@ -18,25 +18,73 @@
   "license": "MIT",
   "author": "Federico Brigante <me@fregante.com> (https://fregante.com)",
   "type": "module",
-  "bin": "./dist/index.js",
   "scripts": {
-    "build": "ncc build cli.js",
+    "prebundle": "dot-json test/extension/manifest.json version $(utc-version)",
+    "bundle": "web-ext build --filename live-test.zip --overwrite-dest",
+    "postbundle": "git restore test/extension/manifest.json",
+    "build": "tsc",
+    "watch": "tsc -w",
     "prepack": "npm run build",
-    "start": "ncc run cli.js",
-    "test": "xo"
+    "test": "xo && vitest run && tsc",
+    "test:upload": "eval $(cat .env) node test/live-test.js",
+    "upload": "npm run bundle && npm run test:upload",
+    "----------------------------------": "----------------------------------",
+    "key-getter": "npm run build && node ./dist/key-getter.js",
+    "key-getter:dev": "npm run build && node ./dist/key-getter.js --dev",
+    "deploy": "npm run build && node ./dist/deploy.js",
+    "deploy:verbose": "npm run build && node ./dist/deploy.js --verbose"
+  },
+  "xo": {
+    "rules": {
+      "camelcase": "off",
+      "object-curly-spacing": [
+        "error",
+        "always"
+      ]
+    },
+    "overrides": [
+      {
+        "files": [
+          "**/*.ts"
+        ],
+        "rules": {
+          "@typescript-eslint/naming-convention": "off",
+          "@typescript-eslint/object-curly-spacing": [
+            "error",
+            "always"
+          ]
+        }
+      }
+    ],
+    "space": 4
   },
   "devDependencies": {
     "@clack/prompts": "^0.7.0",
+    "@sindresorhus/tsconfig": "^5.0.0",
+    "@types/node": "^20.11.19",
+    "@types/open": "^6.2.1",
+    "@types/p-defer": "^2.0.0",
     "@vercel/ncc": "^0.38.1",
+    "dot-json": "^1.3.0",
+    "fetch-mock": "^9.11.0",
     "get-port": "^7.0.0",
+    "node-fetch": "^2.7.0",
     "open": "^10.0.3",
     "p-defer": "^4.0.0",
-    "xo": "^0.56.0"
+    "typescript": "^5.3.3",
+    "utc-version": "^2.0.2",
+    "vitest": "^1.6.0",
+    "xo": "^0.58.0"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "dotenv": "^16.5.0"
+    "chrome-webstore-upload-keys": "file:",
+    "dotenv": "^16.5.0",
+    "publicador-extensao": "file:"
+  },
+  "webExt": {
+    "sourceDir": "test/extension"
   }
 }
