@@ -5,7 +5,6 @@ import { createReadStream } from 'fs';
 import { join, resolve } from 'path';
 import chromeWebstoreUpload from './uploader-publisher.js';
 import * as p from '@clack/prompts';
-import { createDevBundle } from './bundle-developer.js';
 
 config();
 
@@ -159,87 +158,6 @@ async function deploy() {
                 }
             }
         },
-        // {
-        //     title: 'Criando bundle provisional',	
-        //     id: 'criar-bundle-provisional',
-        //     dependsOn: [{ id : 'fazer-upload', successStatus: false  }],
-        //     exitOnError: true,
-        //     async task() {
-        //         // Importar dinamicamente para evitar problemas de dependência circular
-                
-        //         log('Criando bundle de provisional...');
-        //         // Criar bundle de desenvolvimento
-        //         await createDevBundle(projectFolder, log);
-        //         this.success = true; // Marcar a task como bem-sucedida
-        //         return 'Bundle de provisional criado com sucesso';
-        //     },
-        // },
-        // {
-        //     title: 'Fazendo upload do bundle provisional',
-        //     dependsOn: [{ id : 'fazer-upload', successStatus: false  }],
-        //     exitOnError: true,
-        //     async task(message) {
-        //         // Recriar o cliente e tentar upload novamente
-        //         const store = chromeWebstoreUpload({
-        //             extensionId,
-        //             clientId,
-        //             clientSecret,
-        //             refreshToken,
-        //         });
-
-        //         const token = await store.fetchToken();
-                
-                
-        //         // Atualizar manifest para refletir a nova versão
-        //         const devArtifactName = `${manifest.name}(chrome)-${manifest.version + '.9999'}.zip`;
-        //         const devArtifactPath = resolve(projectFolder, '.extension', 'artifacts', devArtifactName);
-
-        //         message(`Fazendo upload do bundle de desenvolvimento: ${devArtifactPath}`);
-                
-        //         const zipStream = createReadStream(devArtifactPath);
-        //         const uploadResult = await store.uploadExisting(zipStream, token);
-
-        //         if (uploadResult.uploadState === 'SUCCESS') {
-        //             return `Extensão provisional uploaded com sucesso`;
-        //         }
-        //         throw new Error(`Development version upload failed: ${uploadResult.itemError?.[0]?.error_detail ?? 'Unknown error'}`);
-        //     },
-        //     enabled: false // Será habilitada apenas se a task anterior falhar
-        // },
-        // {
-        //     title: 'Refazendo upload da extensão',
-        //     dependsOn: [{ id : 'fazer-upload', successStatus: false  }],
-        //     id: 'refazer-upload',
-        //     exitOnError: false,
-        //     async task(message) {
-        //         const store = chromeWebstoreUpload({
-        //             extensionId,
-        //             clientId,
-        //             clientSecret,
-        //             refreshToken,
-        //         });
-
-        //         log('Refazendo upload da extensão...');
-        //         message('Enviando...')
-                
-
-        //         const token = await store.fetchToken();
-        //         const zipStream = createReadStream(artifactPath);
-        //         const uploadResult = await store.uploadExisting(zipStream, token);
-
-                
-
-        //         if (uploadResult.uploadState === 'SUCCESS') {
-        //             this.success = true; // Marcar a task como bem-sucedida
-        //             log('Upload result:', uploadResult);
-        //             return `Extension ${manifest.name} v${manifest.version} uploaded successfully`;
-        //         }else {
-        //             this.success = false; // Marcar a task como falhada
-        //             log('Upload result:', uploadResult);
-        //             throw new Error(`Upload failed: ${uploadResult.itemError?.[0]?.error_detail ?? 'Unknown error'}`);
-        //         }
-        //     }
-        // },
         {
             title: 'Publicando extensão',
             id: 'publicar-extensao',
@@ -265,9 +183,9 @@ async function deploy() {
             }
         },
         {
-            title: 'Publicando extensão trustedTesters',
-            id: 'publicar-extensao-trusted-testers',
-            dependsOn: [{ id : 'refazer-upload', successStatus: true  }],
+            title: 'Falha do upload da extensão',
+            id: 'falha-publicacao',
+            dependsOn: [{ id : 'fazer-upload', successStatus: false  }],
             async task() {
                 const store = chromeWebstoreUpload({
                     extensionId,
@@ -276,15 +194,51 @@ async function deploy() {
                     refreshToken,
                 });
 
-                const token = await store.fetchToken();
-                const publishResult = await store.publish('trustedTesters', token);
-
-                if (publishResult.status.includes('OK') || publishResult.status.includes('ITEM_PENDING_REVIEW')) {
-                    const isPending = publishResult.status.includes('ITEM_PENDING_REVIEW');
-                    return `Extension ${manifest.name} v${manifest.version} published successfully` + 
-                        (isPending ? ' (Pending Review - Your extension requires an in-depth review due to requested permissions)' : '');
-                }
-                throw new Error(`Publication failed: ${publishResult.statusDetail?.[0] ?? 'Unknown error'}`);
+                const manualInterventionMessage = [
+                    "⚠️ ATENÇÃO: NECESSÁRIA INTERVENÇÃO MANUAL ⚠️",
+                    "",
+                    "Foi detectada uma condição que impede a publicação automática da extensão.",
+                    "Esta situação geralmente ocorre quando:",
+                    "",
+                    "1. Existe uma revisão pendente na Chrome Web Store",
+                    "2. Uma publicação anterior está em processo de análise",
+                    "3. A extensão está em estado de bloqueio temporário",
+                    "",
+                    "AÇÕES NECESSÁRIAS:",
+                    "",
+                    "1. Acesse a Chrome Web Store Developer Dashboard",
+                    "   → https://chrome.google.com/webstore/devconsole",
+                    "",
+                    `2. Localize sua extensão: ${manifest.name}`,
+                    `   ID: ${extensionId}`,
+                    "",
+                    "3. Verifique o status atual da extensão na seção \"Status\"",
+                    "",
+                    "4. Se houver uma revisão pendente:",
+                    "   - Clique no botão \"Cancel Review\" ou \"Cancelar Revisão\"",
+                    "   - Aguarde alguns minutos para que o sistema processe o cancelamento",
+                    "   - Tente executar o deploy novamente",
+                    "",
+                    "5. Se o problema persistir:",
+                    "   - Verifique se há notificações ou avisos no painel",
+                    "   - Certifique-se de que não há violações das políticas da Chrome Web Store",
+                    "   - Considere entrar em contato com o suporte da Chrome Web Store",
+                    "",
+                    "IMPORTANTE:",
+                    "- Não tente fazer múltiplos uploads sem resolver o status pendente",
+                    "- O processo de cancelamento pode levar até 30 minutos para ser efetivado",
+                    "- Após o cancelamento, aguarde alguns minutos antes de tentar novamente",
+                    "",
+                    "Para mais informações, consulte:",
+                    "https://developer.chrome.com/docs/webstore/publish",
+                    "",
+                    "⚠️ Execute o deploy novamente após realizar estas ações ⚠️",
+                    ""
+                ];
+                
+                log(manualInterventionMessage.join('\n'));
+                return '❌ Necessária intervenção manual na Chrome Web Store';
+                            
             }
         }
     ];
@@ -330,7 +284,11 @@ async function deploy() {
         await adiar(); // Simular tempo de espera entre as tasks
     }
 
-    p.outro('✨ Deploy completed successfully!');
+    if(tasks.find(t => t.id === 'publicar-extensao')?.success) 
+        p.outro('✨ Deploy realizado com sucesso!');
+    else
+        p.outro('❌ Deploy falhou! Verifique os logs para mais detalhes.');
+    
 }
 
 
