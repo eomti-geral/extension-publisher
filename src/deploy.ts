@@ -159,91 +159,92 @@ async function deploy() {
                 }
             }
         },
-        {
-            title: 'Criando bundle provisional',	
-            id: 'criar-bundle-provisional',
-            dependsOn: [{ id : 'fazer-upload', successStatus: false  }],
-            exitOnError: true,
-            async task() {
-                // Importar dinamicamente para evitar problemas de dependência circular
+        // {
+        //     title: 'Criando bundle provisional',	
+        //     id: 'criar-bundle-provisional',
+        //     dependsOn: [{ id : 'fazer-upload', successStatus: false  }],
+        //     exitOnError: true,
+        //     async task() {
+        //         // Importar dinamicamente para evitar problemas de dependência circular
                 
-                log('Criando bundle de provisional...');
-                // Criar bundle de desenvolvimento
-                await createDevBundle(projectFolder, log);
-                this.success = true; // Marcar a task como bem-sucedida
-                return 'Bundle de provisional criado com sucesso';
-            },
-        },
-        {
-            title: 'Fazendo upload do bundle provisional',
-            dependsOn: [{ id : 'fazer-upload', successStatus: false  }],
-            exitOnError: true,
-            async task(message) {
-                // Recriar o cliente e tentar upload novamente
-                const store = chromeWebstoreUpload({
-                    extensionId,
-                    clientId,
-                    clientSecret,
-                    refreshToken,
-                });
+        //         log('Criando bundle de provisional...');
+        //         // Criar bundle de desenvolvimento
+        //         await createDevBundle(projectFolder, log);
+        //         this.success = true; // Marcar a task como bem-sucedida
+        //         return 'Bundle de provisional criado com sucesso';
+        //     },
+        // },
+        // {
+        //     title: 'Fazendo upload do bundle provisional',
+        //     dependsOn: [{ id : 'fazer-upload', successStatus: false  }],
+        //     exitOnError: true,
+        //     async task(message) {
+        //         // Recriar o cliente e tentar upload novamente
+        //         const store = chromeWebstoreUpload({
+        //             extensionId,
+        //             clientId,
+        //             clientSecret,
+        //             refreshToken,
+        //         });
 
-                const token = await store.fetchToken();
+        //         const token = await store.fetchToken();
                 
                 
-                // Atualizar manifest para refletir a nova versão
-                const devArtifactName = `${manifest.name}(chrome)-${manifest.version + '.9999'}.zip`;
-                const devArtifactPath = resolve(projectFolder, '.extension', 'artifacts', devArtifactName);
+        //         // Atualizar manifest para refletir a nova versão
+        //         const devArtifactName = `${manifest.name}(chrome)-${manifest.version + '.9999'}.zip`;
+        //         const devArtifactPath = resolve(projectFolder, '.extension', 'artifacts', devArtifactName);
 
-                message(`Fazendo upload do bundle de desenvolvimento: ${devArtifactPath}`);
+        //         message(`Fazendo upload do bundle de desenvolvimento: ${devArtifactPath}`);
                 
-                const zipStream = createReadStream(devArtifactPath);
-                const uploadResult = await store.uploadExisting(zipStream, token);
+        //         const zipStream = createReadStream(devArtifactPath);
+        //         const uploadResult = await store.uploadExisting(zipStream, token);
 
-                if (uploadResult.uploadState === 'SUCCESS') {
-                    return `Extensão provisional uploaded com sucesso`;
-                }
-                throw new Error(`Development version upload failed: ${uploadResult.itemError?.[0]?.error_detail ?? 'Unknown error'}`);
-            },
-            enabled: false // Será habilitada apenas se a task anterior falhar
-        },
-        {
-            title: 'Refazendo upload da extensão',
-            dependsOn: [{ id : 'fazer-upload', successStatus: false  }],
-            id: 'refazer-upload',
-            exitOnError: true,
-            async task(message) {
-                const store = chromeWebstoreUpload({
-                    extensionId,
-                    clientId,
-                    clientSecret,
-                    refreshToken,
-                });
+        //         if (uploadResult.uploadState === 'SUCCESS') {
+        //             return `Extensão provisional uploaded com sucesso`;
+        //         }
+        //         throw new Error(`Development version upload failed: ${uploadResult.itemError?.[0]?.error_detail ?? 'Unknown error'}`);
+        //     },
+        //     enabled: false // Será habilitada apenas se a task anterior falhar
+        // },
+        // {
+        //     title: 'Refazendo upload da extensão',
+        //     dependsOn: [{ id : 'fazer-upload', successStatus: false  }],
+        //     id: 'refazer-upload',
+        //     exitOnError: false,
+        //     async task(message) {
+        //         const store = chromeWebstoreUpload({
+        //             extensionId,
+        //             clientId,
+        //             clientSecret,
+        //             refreshToken,
+        //         });
 
-                log('Refazendo upload da extensão...');
-                message('Enviando...')
-                
-
-                const token = await store.fetchToken();
-                const zipStream = createReadStream(artifactPath);
-                const uploadResult = await store.uploadExisting(zipStream, token);
-
+        //         log('Refazendo upload da extensão...');
+        //         message('Enviando...')
                 
 
-                if (uploadResult.uploadState === 'SUCCESS') {
-                    this.success = true; // Marcar a task como bem-sucedida
-                    log('Upload result:', uploadResult);
-                    return `Extension ${manifest.name} v${manifest.version} uploaded successfully`;
-                }else {
-                    this.success = false; // Marcar a task como falhada
-                    log('Upload result:', uploadResult);
-                    throw new Error(`Upload failed: ${uploadResult.itemError?.[0]?.error_detail ?? 'Unknown error'}`);
-                }
-            }
-        },
+        //         const token = await store.fetchToken();
+        //         const zipStream = createReadStream(artifactPath);
+        //         const uploadResult = await store.uploadExisting(zipStream, token);
+
+                
+
+        //         if (uploadResult.uploadState === 'SUCCESS') {
+        //             this.success = true; // Marcar a task como bem-sucedida
+        //             log('Upload result:', uploadResult);
+        //             return `Extension ${manifest.name} v${manifest.version} uploaded successfully`;
+        //         }else {
+        //             this.success = false; // Marcar a task como falhada
+        //             log('Upload result:', uploadResult);
+        //             throw new Error(`Upload failed: ${uploadResult.itemError?.[0]?.error_detail ?? 'Unknown error'}`);
+        //         }
+        //     }
+        // },
         {
             title: 'Publicando extensão',
             id: 'publicar-extensao',
-            dependsOn: [{ id : 'refazer-upload', successStatus: true  }],
+            dependsOn: [{ id : 'fazer-upload', successStatus: true  }],
+
             async task() {
                 const store = chromeWebstoreUpload({
                     extensionId,
@@ -254,6 +255,29 @@ async function deploy() {
 
                 const token = await store.fetchToken();
                 const publishResult = await store.publish('default', token);
+
+                if (publishResult.status.includes('OK') || publishResult.status.includes('ITEM_PENDING_REVIEW')) {
+                    const isPending = publishResult.status.includes('ITEM_PENDING_REVIEW');
+                    return `Extension ${manifest.name} v${manifest.version} published successfully` + 
+                        (isPending ? ' (Pending Review - Your extension requires an in-depth review due to requested permissions)' : '');
+                }
+                throw new Error(`Publication failed: ${publishResult.statusDetail?.[0] ?? 'Unknown error'}`);
+            }
+        },
+        {
+            title: 'Publicando extensão trustedTesters',
+            id: 'publicar-extensao-trusted-testers',
+            dependsOn: [{ id : 'refazer-upload', successStatus: true  }],
+            async task() {
+                const store = chromeWebstoreUpload({
+                    extensionId,
+                    clientId,
+                    clientSecret,
+                    refreshToken,
+                });
+
+                const token = await store.fetchToken();
+                const publishResult = await store.publish('trustedTesters', token);
 
                 if (publishResult.status.includes('OK') || publishResult.status.includes('ITEM_PENDING_REVIEW')) {
                     const isPending = publishResult.status.includes('ITEM_PENDING_REVIEW');
@@ -297,8 +321,10 @@ async function deploy() {
             log('Task failed:', error);
             s.stop(errorMessage);
             task.success = false; // Marcar a task como falhada
-            if(typeof task.exitOnError !== 'undefined' || task.exitOnError) 
+            if(typeof task.exitOnError !== 'undefined' && task.exitOnError === true) {  
+                p.log.error(`Task "${task.title}" failed. Exiting...`);
                 process.exit(1);
+            }
         }
 
         await adiar(); // Simular tempo de espera entre as tasks
