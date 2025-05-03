@@ -25,7 +25,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "prepack": "npm run build",
-    "test": "xo && vitest run && tsc",
+    "test-old": "xo && vitest run && tsc",
     "test:upload": "eval $(cat .env) node test/live-test.js",
     "upload": "npm run bundle && npm run test:upload",
     "test:bundle": "npm run build && node ./dist/testar.js",
@@ -33,7 +33,9 @@
     "key-getter": "npm run build && node ./dist/key-getter.js",
     "key-getter:dev": "npm run build && node ./dist/key-getter.js --dev",
     "deploy": "npm run build && node ./dist/deploy.js",
-    "deploy:verbose": "npm run build && node ./dist/deploy.js --verbose"
+    "deploy:verbose": "npm run build && node ./dist/deploy.js --verbose",
+    "test": "npm run build && vitest run && tsc",
+    "test:fetch-token-live": "npm run build && npx vitest test/fetch-token-live.test.js"
   },
   "xo": {
     "rules": {

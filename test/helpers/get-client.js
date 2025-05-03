@@ -1,4 +1,4 @@
-import webStoreUpload from '../../src/uploader-publisher.js';
+import webStoreUpload from '../../dist/uploader-publisher.js';
 
 export default function getClient() {
     return webStoreUpload({

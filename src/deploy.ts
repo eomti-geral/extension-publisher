@@ -8,7 +8,7 @@ import * as p from '@clack/prompts';
 
 config();
 
-const adiar = () => new Promise(resolve => setTimeout(resolve, 1500))
+const adiar = (ms = 1500) => new Promise(resolve => setTimeout(resolve, ms))
 // Verificar se o modo verbose está ativado
 const isVerbose = process.argv.includes('--verbose');
 
@@ -114,12 +114,14 @@ async function deploy() {
                 await adiar(); // Simular tempo de espera entre as tasks
 
                 this.success = true; // Marcar a task como bem-sucedida
-                return 'Ambiente preparado com sucesso';
+                return '✅ Ambiente preparado com sucesso';
             }
         },
         {
-            title: 'Verificando status inicial da extensão',
-            async task() {
+            title: 'Verificando validade do refresh token',
+            id: 'validar-refresh-token',
+            exitOnError: true,
+            async task(message) {
                 const store = chromeWebstoreUpload({
                     extensionId,
                     clientId,
@@ -127,9 +129,61 @@ async function deploy() {
                     refreshToken,
                 });
 
-                const token = await store.fetchToken();
-                const initialStatus = await store.get('DRAFT', token);
-                return `Status atual: ${initialStatus.uploadState}`;
+                try {
+                    log('🔍 Se o refresh token for válido, esta tarefa será bem sucedida.');
+                    message('Fetching token...');
+                    await adiar()
+                    const token = await store.fetchToken();
+
+                    log('🔍 Status atual da extensão');
+                    message('Fetching status extensão...');
+                    await adiar()
+                    const initialStatus = await store.get('DRAFT', token);
+
+                    log('🔍 Status atual da extensão:');
+                    log('🔍 Status atual:', initialStatus);
+                    log(`🔍 Response: ${initialStatus.uploadState}`);
+                    return `✅ O refresh token é válido`;
+
+                } catch (error) {   
+                    const manualInterventionMessage = [
+                        "⚠️ ATENÇÃO: REFRESH TOKEN EXPIRADO ⚠️",
+                        "",
+                        "O refresh token atual está inválido ou expirado.",
+                        "É necessário gerar um novo token usando o utilitário key-getter.",
+                        "",
+                        "AÇÕES NECESSÁRIAS:",
+                        "",
+                        "1. Abra o terminal na pasta do projeto",
+                        "",
+                        "2. Execute o utilitário key-getter:",
+                        "   → npm run key-getter",
+                        "",
+                        "3. Siga as instruções na tela para autenticação:",
+                        "   - Faça login com sua conta Google",
+                        "   - Autorize o acesso à Chrome Web Store",
+                        "",
+                        "5. Execute o deploy novamente após atualizar o token",
+                        "",
+                        "IMPORTANTE:",
+                        "- O refresh token tem validade limitada",
+                        "- Mantenha o novo token em local seguro",
+                        "- Não compartilhe o token com terceiros",
+                        "",
+                        "⚠️ Execute o deploy novamente após atualizar o token ⚠️",
+                        ""
+                    ];
+                    
+
+                    log(manualInterventionMessage.join('\n'))
+    
+                        ""                                    
+                    if (error instanceof Error) {
+                        throw new Error(`Invalid refresh token: ${error.message}`);
+                    } else {
+                        throw new Error('Invalid refresh token: Unknown error');
+                    }
+                }
             }
         },
         {
@@ -176,6 +230,7 @@ async function deploy() {
 
                 if (publishResult.status.includes('OK') || publishResult.status.includes('ITEM_PENDING_REVIEW')) {
                     const isPending = publishResult.status.includes('ITEM_PENDING_REVIEW');
+                    this.success = true; // Marcar a task como bem-sucedida
                     return `Extension ${manifest.name} v${manifest.version} published successfully` + 
                         (isPending ? ' (Pending Review - Your extension requires an in-depth review due to requested permissions)' : '');
                 }
@@ -197,7 +252,7 @@ async function deploy() {
                 const manualInterventionMessage = [
                     "⚠️ ATENÇÃO: NECESSÁRIA INTERVENÇÃO MANUAL ⚠️",
                     "",
-                    "Foi detectada uma condição que impede a publicação automática da extensão.",
+            "Foi detectada uma condição que impede a publicação automática da extensão.",
                     "Esta situação geralmente ocorre quando:",
                     "",
                     "1. Existe uma revisão pendente na Chrome Web Store",

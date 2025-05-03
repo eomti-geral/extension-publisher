@@ -182,6 +182,31 @@ class APIClient {
         return response.access_token;
     }
 
+    async fetchTokenFull(): Promise<Record<string, unknown>> {
+        const { clientId, clientSecret, refreshToken } = this;
+        const json = {
+            client_id: clientId,
+            refresh_token: refreshToken,
+            grant_type: 'refresh_token',
+            client_secret: clientSecret,
+        };
+
+        if (!clientSecret) {
+            delete json.client_secret;
+        }
+
+        const request = await fetch(refreshTokenURI, {
+            method: 'POST',
+            body: JSON.stringify(json),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const response = await request.json();
+        return response;
+    }
+
     _headers(token: string): { Authorization: string; 'x-goog-api-version': string } {
         return {
             Authorization: `Bearer ${token}`,
