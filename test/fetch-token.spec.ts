@@ -1,14 +1,17 @@
 import { test, assert, beforeEach } from 'vitest';
 import fetchMock from 'fetch-mock';
-import { refreshTokenURI } from '../dist/uploader-publisher.js';
-import getClient from './helpers/get-client.js';
+import { refreshTokenURI } from '../dist/uploader-publisher';
+import getClient from './helpers/get-client';
+import { TestContext } from './test-types';
 
-beforeEach((context) => {
+beforeEach<TestContext>((context) => {
   fetchMock.reset();
   context.client = getClient();
 });
 
-test('Only returns token from response body', async ({ client }) => {
+test<TestContext>('Only returns token from response body', async ({
+  client,
+}) => {
   const accessToken = 'access-token';
 
   fetchMock.post(refreshTokenURI, {
@@ -18,7 +21,9 @@ test('Only returns token from response body', async ({ client }) => {
   assert.equal(await client.fetchToken(), accessToken);
 });
 
-test('Should not return invalid_grant error', async ({ client }) => {
+test<TestContext>('Should not return invalid_grant error', async ({
+  client,
+}) => {
   const errorResponse = {
     error: 'invalid_grant',
     error_description: 'Bad Request',
@@ -34,7 +39,11 @@ test('Should not return invalid_grant error', async ({ client }) => {
     await client.fetchToken();
     throw new Error('Should have thrown an error');
   } catch (error) {
-    assert.equal(error.message, 'Bad Request');
+    if (error instanceof Error) {
+      assert.equal(error.message, 'Bad Request');
+    } else {
+      throw new Error('Unexpected error type');
+    }
   }
 });
 

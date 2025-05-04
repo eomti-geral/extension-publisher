@@ -279,13 +279,6 @@ async function deploy() {
       id: 'falha-publicacao',
       dependsOn: [{ id: 'fazer-upload', successStatus: false }],
       async task() {
-        const store = chromeWebstoreUpload({
-          extensionId,
-          clientId,
-          clientSecret,
-          refreshToken,
-        });
-
         const manualInterventionMessage = [
           '⚠️ ATENÇÃO: NECESSÁRIA INTERVENÇÃO MANUAL ⚠️',
           '',
@@ -359,6 +352,7 @@ async function deploy() {
               task.dependsOn?.find((d) => d.id === dep.id)?.successStatus
             );
           }
+          return false;
         })
       )
         continue; // Pular se alguma dependência falhou

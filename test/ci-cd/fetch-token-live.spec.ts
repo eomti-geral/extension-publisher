@@ -1,24 +1,14 @@
 import { test, beforeEach, expect } from 'vitest';
 import getClient from '../helpers/get-client-live';
-import { APIClient } from '../../src/uploader-publisher';
+import { TestContext, TokenResponse } from '../test-types';
 
-interface TestContext {
-  client: APIClient;
-}
-
-interface TokenResponse {
-  access_token?: string;
-  error?: string;
-  error_description?: string;
-}
-
-beforeEach((context: TestContext) => {
+beforeEach<TestContext>((context: TestContext) => {
   context.client = getClient();
 });
 
-test('Deve retornar um access token válido - de um refresh token válido', async ({
+test<TestContext>('Deve retornar um access token válido - de um refresh token válido', async ({
   client,
-}: TestContext) => {
+}) => {
   console.log('🌐 Requisitando access token');
   const json: TokenResponse = await client.fetchTokenFull();
 

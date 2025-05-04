@@ -31,9 +31,6 @@
     "types": [
       "node",
       "prettier",
-      "jest",
-      "jsdom",
-      "@types/web",
       "vitest/globals"
     ],
     "paths": {

@@ -1,13 +1,16 @@
 import { test, beforeEach } from 'vitest';
 import fetchMock from 'fetch-mock';
-import getClient from './helpers/get-client.js';
+import getClient from './helpers/get-client';
+import { TestContext } from './test-types';
 
-beforeEach((context) => {
+beforeEach<TestContext>((context) => {
   fetchMock.reset();
   context.client = getClient();
 });
 
-test('Publish uses default target when not provided', async ({ client }) => {
+test<TestContext>('Publish uses default target when not provided', async ({
+  client,
+}) => {
   fetchMock.postOnce(
     'https://www.googleapis.com/chromewebstore/v1.1/items/foo/publish?publishTarget=default',
     {}
@@ -16,7 +19,7 @@ test('Publish uses default target when not provided', async ({ client }) => {
   await client.publish(undefined, 'token');
 });
 
-test('Publish uses target when provided', async ({ client }) => {
+test<TestContext>('Publish uses target when provided', async ({ client }) => {
   const target = 'trustedTesters';
 
   fetchMock.postOnce(
@@ -27,7 +30,9 @@ test('Publish uses target when provided', async ({ client }) => {
   await client.publish(target, 'token');
 });
 
-test('Publish uses deployPercentage when provided', async ({ client }) => {
+test<TestContext>('Publish uses deployPercentage when provided', async ({
+  client,
+}) => {
   const deployPercentage = 100;
 
   fetchMock.postOnce(
@@ -38,7 +43,9 @@ test('Publish uses deployPercentage when provided', async ({ client }) => {
   await client.publish('default', 'token', deployPercentage);
 });
 
-test('Publish does not fetch token when provided', async ({ client }) => {
+test<TestContext>('Publish does not fetch token when provided', async ({
+  client,
+}) => {
   fetchMock.postOnce(
     'https://www.googleapis.com/chromewebstore/v1.1/items/foo/publish?publishTarget=default',
     {}
@@ -47,7 +54,7 @@ test('Publish does not fetch token when provided', async ({ client }) => {
   await client.publish(undefined, 'token');
 });
 
-test('Publish uses token for auth', async ({ client }) => {
+test<TestContext>('Publish uses token for auth', async ({ client }) => {
   const token = 'token';
 
   fetchMock.postOnce(
@@ -63,16 +70,8 @@ test('Publish uses token for auth', async ({ client }) => {
   await client.publish(undefined, token);
 });
 
-test('Uses provided extension ID', async ({ client }) => {
+test<TestContext>('Uses provided extension ID', async ({ client }) => {
   const { extensionId } = client;
-
-  // Sandbox.stub(got, 'post').callsFake(uri => {
-  //     t.true(uri.includes(`/items/${extensionId}`));
-
-  //     return {
-  //         json: sandbox.stub().resolves({}),
-  //     };
-  // });
 
   fetchMock.postOnce(
     `https://www.googleapis.com/chromewebstore/v1.1/items/${extensionId}/publish?publishTarget=default`,

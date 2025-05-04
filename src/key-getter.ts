@@ -56,7 +56,9 @@ async function main() {
       for (const line of lines) {
         if (line.startsWith('GOOGLE_CLOUD_API_REFRESH_TOKEN=')) {
           result.refreshToken = line.split('=')[1]?.trim();
-        } else if (line.startsWith('GOOGLE_CLOUD_API_REFRESH_TOKEN_LAST_REQUEST=')) {
+        } else if (
+          line.startsWith('GOOGLE_CLOUD_API_REFRESH_TOKEN_LAST_REQUEST=')
+        ) {
           result.timestamp = line.split('=')[1]?.trim();
         }
       }
@@ -147,12 +149,6 @@ async function main() {
   server.listen(port, localhost);
 
   const serverUrl = `http://${localhost}:${port}`;
-
-  function required(input: string): string | undefined {
-    if (input.trim() === '') {
-      return 'Required';
-    }
-  }
 
   async function getRefreshToken(): Promise<string> {
     const request = await fetch('https://accounts.google.com/o/oauth2/token', {
