@@ -73,6 +73,7 @@
     "node-fetch": "^2.7.0",
     "open": "^10.0.3",
     "p-defer": "^4.0.0",
+    "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "utc-version": "^2.0.2",

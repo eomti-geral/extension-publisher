@@ -1,9 +1,9 @@
 {
-	"name": "TESTING: extension-publisher - não publicar",
-	"version": "9999.9999.9999.9999",
-	"manifest_version": 3,
-	"description": "Demo extension to test the deployer",
-	"action": {
-		"default_popup": "popup.html"
-	}
+  "name": "TESTING: extension-publisher - não publicar",
+  "version": "9999.9999.9999.9999",
+  "manifest_version": 3,
+  "description": "Demo extension to test the deployer",
+  "action": {
+    "default_popup": "popup.html"
+  }
 }
