@@ -1,7 +1,7 @@
-# Privacy Policy for "TESTING" chrome-webstore-upload demo"
+# Política de Privacidade para "TESTING" extension-publisher"
 
-No data or personal information is collected by "TESTING" chrome-webstore-upload demo".
+Nenhum dado ou informação pessoal é coletado pelo "TESTING" chrome-webstore-upload demo".
 
-##### Contact
+## Informações Adicionais
 
-If you have any questions or suggestions regarding this privacy policy, do not hesitate to [contact us](https://github.com/fregante/chrome-webstore-upload/issues/new).
+Esta extensão foi desenvolvida exclusivamente para fins de teste dentro deste projeto. Não foi projetada para uso público ou distribuição. Nenhuma funcionalidade desta extensão coleta, armazena ou compartilha dados de usuários.

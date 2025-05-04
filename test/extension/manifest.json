@@ -1,8 +1,8 @@
 {
-  "name": "TESTING: extension-publisher - não publicar",
+  "name": "EXTENSÃO PARA UNIDADE DE TESTES: extension-publisher",
   "version": "9999.9999.9999.9999",
   "manifest_version": 3,
-  "description": "Demo extension to test the deployer",
+  "description": "Modelo de extensão unicamente para ser utilizada para fim de unidade de testes anterior a deploy por CI/CD",
   "action": {
     "default_popup": "popup.html"
   }
