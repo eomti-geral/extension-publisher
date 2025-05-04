@@ -216,3 +216,37 @@ key-getter
 > - Uma vez obtido, o token é armazenado com segurança e pode ser usado nos processos automatizados
 >
 > **NÃO TENTE** incluir este utilitário em pipelines automatizados ou scripts não interativos. É esperado que a pipeline CI/CD requisite uma intervenção manual para atualização do refresh token para execução da tarefa de deploy
+
+## Requisitos para Extensão de Teste em Testes Unitários
+
+Ao realizar testes unitários com a extensão de teste, é **IMPRESCINDÍVEL** que o arquivo `manifest.json` da extensão de teste contenha as **mesmas permissões** que o arquivo `manifest.json` da extensão de produção. Isso é necessário para evitar problemas relacionados à privacidade e à consistência das informações já definidas na Chrome Web Store.
+
+### Impacto de Permissões Divergentes
+
+Se as permissões da extensão de teste forem diferentes das permissões da extensão de produção, as seguintes consequências podem ocorrer:
+
+1. **Perda de Informações de Privacidade**
+   - A Chrome Web Store pode redefinir ou remover as informações de privacidade previamente configuradas para a extensão de produção.
+   - Isso ocorre porque a Chrome Web Store valida as permissões declaradas no `manifest.json` para garantir que estejam alinhadas com as políticas de privacidade.
+
+2. **Falhas nos Testes Unitários**
+   - Testes que dependem de permissões específicas podem falhar devido à ausência de permissões necessárias no `manifest.json` da extensão de teste.
+
+3. **Rejeição de Atualizações**
+   - Atualizações futuras da extensão de produção podem ser rejeitadas pela Chrome Web Store devido a inconsistências detectadas entre as permissões declaradas e as informações de privacidade.
+
+### Boas Práticas para Configuração do `manifest.json`
+
+1. **Sincronize as Permissões**
+   - Certifique-se de que o arquivo `manifest.json` da extensão de teste seja uma cópia fiel do arquivo `manifest.json` da extensão de produção, especialmente no que diz respeito às permissões declaradas.
+
+2. **Valide as Permissões Antes de Testar**
+   - Antes de executar os testes unitários, valide que as permissões no `manifest.json` da extensão de teste estão alinhadas com as permissões da extensão de produção.
+
+3. **Automatize a Verificação**
+   - Considere implementar um script ou ferramenta que compare os arquivos `manifest.json` das extensões de teste e produção para garantir que estejam sincronizados.
+
+4. **Documente as Alterações**
+   - Sempre que houver alterações nas permissões da extensão de produção, atualize imediatamente o `manifest.json` da extensão de teste e documente a mudança para evitar inconsistências futuras.
+
+Seguir essas práticas garantirá que os testes unitários sejam executados de forma confiável e que as informações de privacidade da extensão de produção permaneçam intactas na Chrome Web Store.

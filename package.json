@@ -18,23 +18,18 @@
   ],
   "license": "MIT",
   "scripts": {
-    "prebundle-velho": "dot-json test/extension/manifest.json version $(utc-version)",
-    "postbundle-velho": "git restore test/extension/manifest.json",
     "build": "tsc",
     "watch": "tsc -w",
     "prepack": "npm run build",
-    "upload": "npm run bundle && npm run test:upload",
-    "test:bundle": "esno ./dist/testar.js",
-    "----------------------------------": "----------------------------------",
     "key-getter": "esno src/key-getter.ts",
     "key-getter:dev": "esno ./dist/key-getter.js --dev",
-    "deploy": "esno ./dist/deploy.js",
-    "deploy:verbose": "esno ./dist/deploy.js --verbose",
+    "deploy": "esno ./src/deploy.ts",
+    "deploy:verbose": "esno ./src/deploy.ts --verbose",
     "test": "npx vitest run --exclude test/ci-cd/** && tsc",
     "test:fetch-token-live": "npx vitest test/ci-cd/fetch-token-live.spec.ts",
     "test:publish-live": "npm run bundle && npx vitest test/ci-cd/publish-live.spec.ts",
     "bundle": "web-ext build --filename live-test.zip --overwrite-dest",
-    "test:ci-cd": "npx vitest test/ci-cd"
+    "test:ci-cd": "npm run bundle && npx vitest test/ci-cd"
   },
   "xo": {
     "rules": {
@@ -94,5 +89,9 @@
   },
   "webExt": {
     "sourceDir": "test/extension"
+  },
+  "path": {
+    "dist": ".extension/dist",
+    "artifact": ".extension/artifacts"
   }
 }

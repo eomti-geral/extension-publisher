@@ -5,5 +5,16 @@
   "description": "Modelo de extensão unicamente para ser utilizada para fim de unidade de testes anterior a deploy por CI/CD",
   "action": {
     "default_popup": "popup.html"
-  }
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "webNavigation",
+    "tabs",
+    "downloads"
+  ],
+  "host_permissions": [
+    "*://*/"
+  ]
 }

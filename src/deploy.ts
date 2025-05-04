@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 import { readFile } from 'fs/promises';
 import { createReadStream } from 'fs';
 import { join, resolve } from 'path';
-import chromeWebstoreUpload from './uploader-publisher.js';
+import chromeWebstoreUpload from './uploader-publisher';
 import * as p from '@clack/prompts';
 
 config();
@@ -103,6 +103,7 @@ async function deploy() {
     {
       title: 'Preparando ambiente para deploy',
       id: 'preparar-ambiente',
+      exitOnError: true,
       async task() {
         // Exibir informações do ambiente
         const envInfo = {
@@ -132,8 +133,29 @@ async function deploy() {
         log('🔍 Relevant manifest.json properties:');
         log(JSON.stringify(manifest, null, 2));
 
+        // Verificar se o arquivo manifest.json existe
+        try {
+          await readFile(
+            join(projectFolder, '.extension', 'dist', 'manifest.json')
+          );
+        } catch (error) {
+          throw new Error(
+            'O arquivo manifest.json não foi encontrado no local esperado. Verifique se ele foi gerado corretamente.'
+          );
+        }
+        log('🔍 manifest.json encontrado.');
+
+        // Verificar se o arquivo .zip do artefato existe
+        try {
+          await readFile(artifactPath);
+        } catch (error) {
+          throw new Error(
+            `O arquivo .zip do artefato (${artifactName}) não foi encontrado no local esperado. Verifique se ele foi gerado corretamente.`
+          );
+        }
+
         // Exibir informações do artefato
-        log(`🔍 Looking for artifact at: ${artifactPath}\n`);
+        log(`🔍 Artifact found at: ${artifactPath}\n`);
 
         await adiar(); // Simular tempo de espera entre as tasks
 
@@ -221,9 +243,20 @@ async function deploy() {
           refreshToken,
         });
 
+        log('🔍 fetching new token...');
         const token = await store.fetchToken();
+        log('🔍 streaming zip file...');
         const zipStream = createReadStream(artifactPath);
-        const uploadResult = await store.uploadExisting(zipStream, token);
+        log('🔍 enviando...');
+
+        let uploadResult;
+        try {
+          const res = await store.uploadExisting(zipStream, token);
+          uploadResult = res;
+        } catch (error) {
+          if (error instanceof Error) p.log.error(error.message);
+          throw new Error('Unkown error uploading extension');
+        }
 
         if (uploadResult.uploadState === 'SUCCESS') {
           this.success = true; // Marcar a task como bem-sucedida
