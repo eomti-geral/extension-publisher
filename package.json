@@ -26,7 +26,7 @@
     "upload": "npm run bundle && npm run test:upload",
     "test:bundle": "esno ./dist/testar.js",
     "----------------------------------": "----------------------------------",
-    "key-getter": "esno ./dist/key-getter.js",
+    "key-getter": "esno src/key-getter.ts",
     "key-getter:dev": "esno ./dist/key-getter.js --dev",
     "deploy": "esno ./dist/deploy.js",
     "deploy:verbose": "esno ./dist/deploy.js --verbose",

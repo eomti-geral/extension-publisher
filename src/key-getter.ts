@@ -6,7 +6,7 @@ import open from 'open';
 import getPort from 'get-port';
 import pDefer from 'p-defer';
 import { config } from 'dotenv';
-import { sendRefreshToken } from './api-sender.js';
+import { sendRefreshToken } from './api-sender';
 import { writeFile, readFile } from 'fs/promises';
 import { join } from 'path';
 
@@ -26,6 +26,10 @@ type GoogleTokenResponse = {
     refresh_token: string;
     error?: string;
 };
+
+async function main() {
+    
+
 
 const approvalCode = pDefer<string>();
 const port = await getPort();
@@ -284,4 +288,6 @@ await tasks([
 ]);
 
 // Finaliza o processo após completar todas as tarefas
-process.exit(0);
+}
+
+main()
