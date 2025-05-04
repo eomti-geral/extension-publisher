@@ -1,5 +1,5 @@
 import { test, beforeEach, expect } from 'vitest';
-import getClient from './helpers/get-client-live.js';
+import getClient from '../helpers/get-client-live.js';
 
 beforeEach(context => {
     context.client = getClient();
