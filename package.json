@@ -19,9 +19,8 @@
   "author": "Federico Brigante <me@fregante.com> (https://fregante.com)",
   "type": "module",
   "scripts": {
-    "prebundle": "dot-json test/extension/manifest.json version $(utc-version)",
-    "bundle": "web-ext build --filename live-test.zip --overwrite-dest",
-    "postbundle": "git restore test/extension/manifest.json",
+    "prebundle-velho": "dot-json test/extension/manifest.json version $(utc-version)",
+    "postbundle-velho": "git restore test/extension/manifest.json",
     "build": "tsc",
     "watch": "tsc -w",
     "prepack": "npm run build",
@@ -34,8 +33,10 @@
     "key-getter:dev": "npm run build && node ./dist/key-getter.js --dev",
     "deploy": "npm run build && node ./dist/deploy.js",
     "deploy:verbose": "npm run build && node ./dist/deploy.js --verbose",
-    "test": "npm run build && vitest run && tsc",
-    "test:fetch-token-live": "npm run build && npx vitest test/fetch-token-live.test.js"
+    "test": "npm run build && npm run bundle && vitest run && tsc",
+    "test:fetch-token-live": "npm run build && npx vitest test/fetch-token-live.test.js",
+    "test:publish-live": "npm run build && npm run bundle && npx vitest test/publish-live.test.js",
+    "bundle": "web-ext build --filename live-test.zip --overwrite-dest",
   },
   "xo": {
     "rules": {

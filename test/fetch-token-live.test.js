@@ -1,8 +1,5 @@
 import { test, beforeEach, expect } from 'vitest';
 import getClient from './helpers/get-client-live.js';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 beforeEach(context => {
     context.client = getClient();
