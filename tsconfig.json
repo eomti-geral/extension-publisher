@@ -28,11 +28,11 @@
     "removeComments": true,
     "useDefineForClassFields": true, // https://vitejs.dev/guide/features.html#typescript-compiler-options
     "jsx": "preserve",
-    "types": ["node", "prettier", "jest", "jsdom", "@types/web"],
+    "types": ["node", "prettier", "jest", "jsdom", "@types/web", "vitest/globals"],
     "paths": {
       "~/*": ["src/*"],
     }
   },
-  "include": ["src/*.ts"],
+  "include": ["src/*.ts", "test/**/*.spec.ts"],
   "exclude": ["node_modules", "dist"]
 }

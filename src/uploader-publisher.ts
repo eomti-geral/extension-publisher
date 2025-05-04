@@ -70,7 +70,7 @@ function throwIfNotOk(request: Response, response: unknown) {
     }
 }
 
-class APIClient {
+export class APIClient {
     extensionId: string;
     clientId: string;
     refreshToken: string;

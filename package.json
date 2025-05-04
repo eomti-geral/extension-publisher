@@ -23,20 +23,18 @@
     "build": "tsc",
     "watch": "tsc -w",
     "prepack": "npm run build",
-    "test-old": "xo && vitest run && tsc",
-    "test:upload": "eval $(cat .env) node test/live-test.js",
     "upload": "npm run bundle && npm run test:upload",
-    "test:bundle": "npm run build && node ./dist/testar.js",
+    "test:bundle": "esno ./dist/testar.js",
     "----------------------------------": "----------------------------------",
-    "key-getter": "npm run build && node ./dist/key-getter.js",
-    "key-getter:dev": "npm run build && node ./dist/key-getter.js --dev",
-    "deploy": "npm run build && node ./dist/deploy.js",
-    "deploy:verbose": "npm run build && node ./dist/deploy.js --verbose",
-    "test": "npm run build &&  vitest run --exclude test/ci-cd/** && tsc",
-    "test:fetch-token-live": "npm run build && npx vitest test/fetch-token-live.test.js",
-    "test:publish-live": "npm run build && npm run bundle && npx vitest test/publish-live.test.js",
+    "key-getter": "esno ./dist/key-getter.js",
+    "key-getter:dev": "esno ./dist/key-getter.js --dev",
+    "deploy": "esno ./dist/deploy.js",
+    "deploy:verbose": "esno ./dist/deploy.js --verbose",
+    "test": "npx vitest run --exclude test/ci-cd/** && tsc",
+    "test:fetch-token-live": "npx vitest test/ci-cd/fetch-token-live.spec.ts",
+    "test:publish-live": "npm run bundle && npx vitest test/ci-cd/publish-live.spec.ts",
     "bundle": "web-ext build --filename live-test.zip --overwrite-dest",
-    "test:ci-cd": "npm run build && npx vitest test/ci-cd/**"
+    "test:ci-cd": "npx vitest test/ci-cd"
   },
   "xo": {
     "rules": {
@@ -75,9 +73,10 @@
     "node-fetch": "^2.7.0",
     "open": "^10.0.3",
     "p-defer": "^4.0.0",
-    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
     "utc-version": "^2.0.2",
-    "vitest": "^1.6.0",
+    "vitest": "^1.6.1",
     "xo": "^0.58.0"
   },
   "engines": {
