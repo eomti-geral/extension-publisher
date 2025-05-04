@@ -13,11 +13,10 @@
     "upload",
     "cli"
   ],
-  "repository": "fregante/chrome-webstore-upload-keys",
-  "funding": "https://github.com/sponsors/fregante",
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
-  "author": "Federico Brigante <me@fregante.com> (https://fregante.com)",
-  "type": "module",
   "scripts": {
     "prebundle-velho": "dot-json test/extension/manifest.json version $(utc-version)",
     "postbundle-velho": "git restore test/extension/manifest.json",
@@ -85,8 +84,12 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@types/node": "^18.19.54",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.5.0",
+    "esno": "^0.14.1",
     "publicador-extensao": "file:",
+    "tsx": "^4.19.2",
     "web-ext": "^8.6.0"
   },
   "webExt": {

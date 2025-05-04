@@ -1,14 +1,37 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "strict": true,
     "outDir": "dist",
     "sourceMap": true,
     "declaration": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowJs": true,
+    "baseUrl": ".",
+    "rootDir": ".",
+    "target": "esnext",
+    "lib": ["ESNext", "DOM"],
+    "module": "ESNext",
+    "isolatedModules": true, // https://vitejs.dev/guide/features.html#typescript-compiler-options
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true, // Adicionando
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "incremental": false,
+    "removeComments": true,
+    "useDefineForClassFields": true, // https://vitejs.dev/guide/features.html#typescript-compiler-options
+    "jsx": "preserve",
+    "types": ["node", "prettier", "jest", "jsdom", "@types/web"],
+    "paths": {
+      "~/*": ["src/*"],
+    }
   },
   "include": ["src/*.ts"],
   "exclude": ["node_modules", "dist"]
