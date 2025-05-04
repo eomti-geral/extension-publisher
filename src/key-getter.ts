@@ -56,7 +56,7 @@ async function main() {
       for (const line of lines) {
         if (line.startsWith('GOOGLE_CLOUD_API_REFRESH_TOKEN=')) {
           result.refreshToken = line.split('=')[1]?.trim();
-        } else if (line.startsWith('LAST_TOKEN_REQUEST=')) {
+        } else if (line.startsWith('GOOGLE_CLOUD_API_REFRESH_TOKEN_LAST_REQUEST=')) {
           result.timestamp = line.split('=')[1]?.trim();
         }
       }
@@ -94,7 +94,7 @@ async function main() {
       '# Refresh token generated automatically',
       `GOOGLE_CLOUD_API_REFRESH_TOKEN=${refreshToken}`,
       '# Last token request timestamp',
-      `LAST_TOKEN_REQUEST=${date}`,
+      `GOOGLE_CLOUD_API_REFRESH_TOKEN_LAST_REQUEST=${date}`,
     ].join('\n');
 
     // Combina o conteúdo original com a nova seção
@@ -324,6 +324,22 @@ async function main() {
           gitLabToken,
           env.GOOGLE_CLOUD_API_REFRESH_TOKEN!,
           'GOOGLE_CLOUD_API_REFRESH_TOKEN'
+        );
+      },
+    },
+    {
+      title:
+        'Enviando GOOGLE_CLOUD_API_REFRESH_TOKEN_LAST_REQUEST para o GitLab',
+      enabled: !isDev,
+      async task() {
+        return sendRefreshToken(
+          gitLabToken,
+          env.GOOGLE_CLOUD_API_REFRESH_TOKEN_LAST_REQUEST!,
+          'GOOGLE_CLOUD_API_REFRESH_TOKEN_LAST_REQUEST',
+          {
+            masked: false,
+            protected: false,
+          }
         );
       },
     },

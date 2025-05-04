@@ -1,24 +1,18 @@
 import process from 'node:process';
-import { config } from 'dotenv';
-
-config();
-
-type GitLabResponse = {
-  message?: string;
-};
 
 async function updateOrCreateVariable(
   token: string,
   projectId: string,
   value: string,
-  key: string
+  key: string,
+  options?: { protected?: boolean; masked?: boolean }
 ): Promise<string> {
   const baseUrl = `https://git.cnj.jus.br/api/v4/projects/${projectId}/variables`;
   const body = {
     key,
     value,
-    protected: true,
-    masked: true,
+    protected: options?.protected ?? true,
+    masked: options?.masked ?? true,
   };
 
   try {
@@ -70,7 +64,8 @@ async function updateOrCreateVariable(
 export async function sendRefreshToken(
   token: string,
   value: string,
-  key: string
+  key: string,
+  options?: { protected?: boolean; masked?: boolean }
 ): Promise<string> {
   const projectId = process.env.GIT_LAB_PROJECT_ID;
 
@@ -83,5 +78,5 @@ export async function sendRefreshToken(
   }
 
   const encodedProjectId = encodeURIComponent(projectId);
-  return updateOrCreateVariable(token, encodedProjectId, value, key);
+  return updateOrCreateVariable(token, encodedProjectId, value, key, options);
 }
