@@ -1,12 +1,18 @@
 #!/usr/bin/env node
 import { config } from 'dotenv';
 import { readFile } from 'fs/promises';
+import { readFileSync } from 'fs';
 import { createReadStream } from 'fs';
 import { join, resolve } from 'path';
 import chromeWebstoreUpload from './uploader-publisher';
 import * as p from '@clack/prompts';
 
 config();
+
+// Load paths from package.json
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));
+const projExtDistPath = packageJson.path.dist;
+const projExtArtifactPath = packageJson.path.artifact;
 
 const adiar = (ms = 1500) => new Promise((resolve) => setTimeout(resolve, ms));
 // Verificar se o modo verbose está ativado
@@ -41,17 +47,12 @@ async function readManifest(
   message: (message: string) => void
 ): Promise<ExtensionManifest> {
   try {
-    const manifestPath = join(
-      projectPath,
-      '.extension',
-      'dist',
-      'manifest.json'
-    );
+    const manifestPath = join(projectPath, projExtDistPath, 'manifest.json');
     message(`Reading manifest.json from ${manifestPath}`);
     const content = await readFile(manifestPath, 'utf-8');
     const manifest = JSON.parse(content);
 
-    // Extrair apenas as propriedades relevantes
+    // Extract only the relevant properties
     const relevantInfo = {
       name: manifest.name,
       version: manifest.version,
@@ -94,7 +95,6 @@ async function deploy() {
   // Ler o manifest.json da extensão
   let manifest: Record<string, unknown>;
   let artifactName: string;
-  let artifactPath: string;
 
   await new Promise((resolve) => setTimeout(resolve, 3000)); // Simular tempo de espera
 
@@ -116,10 +116,9 @@ async function deploy() {
 
         manifest = await readManifest(projectFolder, log);
         artifactName = `${manifest.name}(chrome)-${manifest.version}.zip`;
-        artifactPath = resolve(
+        const artifactPath = resolve(
           projectFolder,
-          '.extension',
-          'artifacts',
+          projExtArtifactPath,
           artifactName
         );
 
@@ -128,16 +127,14 @@ async function deploy() {
 
         // Exibir informações do manifest
         log(
-          `🔍 Reading manifest.json from ${join(projectFolder, '.extension', 'dist', 'manifest.json')}`
+          `🔍 Reading manifest.json from ${join(projectFolder, projExtDistPath, 'manifest.json')}`
         );
         log('🔍 Relevant manifest.json properties:');
         log(JSON.stringify(manifest, null, 2));
 
         // Verificar se o arquivo manifest.json existe
         try {
-          await readFile(
-            join(projectFolder, '.extension', 'dist', 'manifest.json')
-          );
+          await readFile(join(projectFolder, projExtDistPath, 'manifest.json'));
         } catch (error) {
           throw new Error(
             'O arquivo manifest.json não foi encontrado no local esperado. Verifique se ele foi gerado corretamente.'
@@ -246,7 +243,9 @@ async function deploy() {
         log('🔍 fetching new token...');
         const token = await store.fetchToken();
         log('🔍 streaming zip file...');
-        const zipStream = createReadStream(artifactPath);
+        const zipStream = createReadStream(
+          resolve(projectFolder, projExtArtifactPath, artifactName)
+        );
         log('🔍 enviando...');
 
         let uploadResult;
