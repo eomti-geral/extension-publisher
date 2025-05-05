@@ -6,6 +6,7 @@ import { createReadStream } from 'fs';
 import { join, resolve } from 'path';
 import chromeWebstoreUpload from './uploader-publisher';
 import * as p from '@clack/prompts';
+import { buildProjAlias } from './build-proj-alias';
 
 config();
 
@@ -17,6 +18,7 @@ const projExtArtifactPath = packageJson.path.artifact;
 const adiar = (ms = 1500) => new Promise((resolve) => setTimeout(resolve, ms));
 // Verificar se o modo verbose está ativado
 const isVerbose = process.argv.includes('--verbose');
+const noProjecProvided = process.argv.includes('--no-project');
 
 function log(message: string, data?: unknown) {
   if (isVerbose) {
@@ -74,7 +76,7 @@ async function deploy() {
 
   const { env } = process;
   const extensionId = env.EXTENSION_ARTIFACT_ID;
-  const projectFolder = env.EXTENSION_PROJECT_FOLDER;
+  const projectFolder = noProjecProvided ? '.' : env.EXTENSION_PROJECT_FOLDER;
   const clientId = env.GOOGLE_CLOUD_API_CLIENT_ID;
   const clientSecret = env.GOOGLE_CLOUD_API_CLIENT_SECRET;
   const refreshToken = env.GOOGLE_CLOUD_API_REFRESH_TOKEN;
@@ -91,6 +93,8 @@ async function deploy() {
       'Missing required environment variables. Please check your .env file.'
     );
   }
+
+  if (noProjecProvided) buildProjAlias();
 
   // Ler o manifest.json da extensão
   let manifest: Record<string, unknown>;

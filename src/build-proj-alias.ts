@@ -19,7 +19,7 @@ const copyDirectory = (source: string, destination: string) => {
   });
 };
 
-const main = async () => {
+export const buildProjAlias = async () => {
   try {
     // Read package.json
     const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
@@ -66,8 +66,6 @@ const main = async () => {
     console.log('Deployment setup completed successfully!');
   } catch (error) {
     console.error('Error during deployment setup:', error);
-    process.exit(1);
+    throw error; // Lançar o erro em vez de encerrar o processo
   }
 };
-
-main();

@@ -37,6 +37,6 @@
       "~/*": ["src/*"]
     }
   },
-  "include": ["src/*.ts", "test/**/*.spec.ts"],
+  "include": ["src/*.ts", "test/**/*.spec.ts", "test/deploy-test-live-extension-project-alias.ts"],
   "exclude": ["node_modules", "dist"]
 }
