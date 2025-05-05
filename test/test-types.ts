@@ -1,5 +1,5 @@
 import { TestContext as VitestTestContext } from 'vitest';
-import { APIClient } from '../src/uploader-publisher';
+import { APIClient } from '~/uploader-publisher';
 
 export interface TestContext extends VitestTestContext {
   client: APIClient;

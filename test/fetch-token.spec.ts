@@ -1,6 +1,6 @@
 import { test, assert, beforeEach } from 'vitest';
 import fetchMock from 'fetch-mock';
-import { refreshTokenURI } from '../dist/uploader-publisher';
+import { refreshTokenURI } from '~/uploader-publisher';
 import getClient from './helpers/get-client';
 import { TestContext } from './test-types';
 
