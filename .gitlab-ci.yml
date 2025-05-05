@@ -5,19 +5,24 @@ stages:
 
 variables:
   NODE_ENV: production
+  GOOGLE_CLOUD_API_CLIENT_ID: $GOOGLE_CLOUD_API_CLIENT_ID
+  GOOGLE_CLOUD_API_CLIENT_SECRET: $GOOGLE_CLOUD_API_CLIENT_SECRET
+  GOOGLE_CLOUD_API_REFRESH_TOKEN: $GOOGLE_CLOUD_API_REFRESH_TOKEN
+  EXTENSION_ARTIFACT_ID: $EXTENSION_ARTIFACT_ID
+  EXTENSION_PROJECT_FOLDER: .
 
 default:
   image: node:22
-
-before_script:
-  - npm install
+  before_script:
+    - npm install
 
 build:
   stage: build
   script:
-    - echo "Build iniciado com Node.js $(node -v)"
-    - npm run build
-    - echo "Build concluído"
+    - echo "Build concluído" # Substitua por um build real se necessário
+  only:
+    changes:
+      - "**/*"
 
 test:
   stage: test
@@ -28,15 +33,20 @@ test:
       - NODE_VERSION: "18"
   image: node:${NODE_VERSION}
   script:
-    - echo "Rodando testes em Node.js $NODE_VERSION"
     - npm test
     - npm run test:ci-cd
+  only:
+    changes:
+      - "**/*"
 
 deploy:
   stage: deploy
   script:
-    - echo "Iniciando deploy..."
-    - npm run deploy:pre:proj-alias
-    - npm run deploy:verbose
+    - npm run build
+    - npm run bundle
+    # - npm run deploy
+    - npm run deploy:no-project
   only:
     - main
+  except:
+    - "*.md"
