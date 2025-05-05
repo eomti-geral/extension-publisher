@@ -20,7 +20,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "prepack": "pnpm build",
+    "prepack": "npm build",
     "key-getter": "esno src/key-getter.ts",
     "key-getter:dev": "esno ./dist/key-getter.js --dev",
     "deploy": "esno ./src/deploy.ts",
@@ -28,9 +28,9 @@
     "deploy:pre:proj-alias": "esno ./src/deploy-test-live-extension-project-alias.ts",
     "test": "npx vitest run --exclude \"test/ci-cd/**\" && tsc",
     "test:fetch-token-live": "npx vitest test/ci-cd/fetch-token-live.spec.ts",
-    "test:publish-live": "pnpm run bundle && npx vitest test/ci-cd/publish-live.spec.ts",
+    "test:publish-live": "npm run bundle && npx vitest test/ci-cd/publish-live.spec.ts",
     "bundle": "web-ext build --filename live-test.zip --overwrite-dest",
-    "test:ci-cd": "pnpm run bundle && npx vitest test/ci-cd"
+    "test:ci-cd": "npm run bundle && npx vitest test/ci-cd"
   },
   "devDependencies": {
     "@clack/prompts": "^0.10.1",
