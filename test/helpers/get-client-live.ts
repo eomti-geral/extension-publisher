@@ -1,5 +1,4 @@
-import { APIClient } from '~/uploader-publisher.js';
-import chromeWebstoreUpload from '../../dist/uploader-publisher.js';
+import chromeWebstoreUpload, { APIClient } from '~/uploader-publisher';
 import dotenv from 'dotenv';
 
 dotenv.config();
