@@ -59,5 +59,7 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - run: npm build
+      - run: npm bundle
       - run: npm run deploy:pre:proj-alias
       - run: npm run deploy:verbose
