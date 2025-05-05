@@ -1,4 +1,4 @@
-import webStoreUpload, { APIClient } from '../../src/uploader-publisher';
+import webStoreUpload, { APIClient } from '~/uploader-publisher';
 
 export default function getClient(): APIClient {
   return webStoreUpload({
