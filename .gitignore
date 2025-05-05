@@ -4,3 +4,4 @@ dist
 web-ext-artifacts/
 .env
 package-lock.json
+.extension/
