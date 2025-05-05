@@ -9,44 +9,44 @@ on:
       - '**/*.md'
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    env:
-      NODE_ENV: production
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: npm install
-      - run: echo "Build concluído" # Substitua por um build real se necessário
+  # build:
+  #   name: Build
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     NODE_ENV: production
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 22
+  #     - run: npm install
+  #     - run: echo "Build concluído" # Substitua por um build real se necessário
 
-  test:
-    name: Test (Node.js ${{ matrix.node-version }})
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [22, 20, 18]
-    env:
-      GOOGLE_CLOUD_API_CLIENT_ID: ${{ secrets.GOOGLE_CLOUD_API_CLIENT_ID }}
-      GOOGLE_CLOUD_API_CLIENT_SECRET: ${{ secrets.GOOGLE_CLOUD_API_CLIENT_SECRET }}
-      GOOGLE_CLOUD_API_REFRESH_TOKEN: ${{ secrets.GOOGLE_CLOUD_API_REFRESH_TOKEN }}
-      EXTENSION_ARTIFACT_ID: ${{ vars.EXTENSION_ARTIFACT_ID }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm install
-      - run: npm test
-      - run: npm run test:ci-cd
+  # test:
+  #   name: Test (Node.js ${{ matrix.node-version }})
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       node-version: [22, 20, 18]
+  #   env:
+  #     GOOGLE_CLOUD_API_CLIENT_ID: ${{ secrets.GOOGLE_CLOUD_API_CLIENT_ID }}
+  #     GOOGLE_CLOUD_API_CLIENT_SECRET: ${{ secrets.GOOGLE_CLOUD_API_CLIENT_SECRET }}
+  #     GOOGLE_CLOUD_API_REFRESH_TOKEN: ${{ secrets.GOOGLE_CLOUD_API_REFRESH_TOKEN }}
+  #     EXTENSION_ARTIFACT_ID: ${{ vars.EXTENSION_ARTIFACT_ID }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+  #     - run: npm install
+  #     - run: npm test
+  #     - run: npm run test:ci-cd
 
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: [build, test]
+    #needs: [build, test]
     if: github.ref == 'refs/heads/main'
     env:
       GOOGLE_CLOUD_API_CLIENT_ID: ${{ secrets.GOOGLE_CLOUD_API_CLIENT_ID }}

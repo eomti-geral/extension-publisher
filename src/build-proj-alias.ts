@@ -1,9 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 
-const copyDirectory = (source: string, destination: string) => {
+const copyDirectory = (
+  source: string,
+  destination: string,
+  log: { info: (msg: string) => void }
+) => {
+  log.info(`🔄 Copiando diretório de: ${source} para: ${destination}`);
   if (!fs.existsSync(destination)) {
     fs.mkdirSync(destination, { recursive: true });
+    log.info(`📁 Diretório criado: ${destination}`);
   }
 
   const files = fs.readdirSync(source);
@@ -12,38 +18,64 @@ const copyDirectory = (source: string, destination: string) => {
     const destPath = path.join(destination, file);
 
     if (fs.statSync(sourcePath).isDirectory()) {
-      copyDirectory(sourcePath, destPath);
+      log.info(`📂 Entrando no subdiretório: ${sourcePath}`);
+      copyDirectory(sourcePath, destPath, log);
     } else {
       fs.copyFileSync(sourcePath, destPath);
+      log.info(`📄 Arquivo copiado: ${sourcePath} -> ${destPath}`);
     }
   });
 };
 
-export const buildProjAlias = async () => {
+export const buildProjAlias = async (log: {
+  message: (message?: string, { symbol }?: any) => void;
+  info: (message: string) => void;
+  success: (message: string) => void;
+  step: (message: string) => void;
+  warn: (message: string) => void;
+  warning: (message: string) => void;
+  error: (message: string) => void;
+}) => {
   try {
+    log.info('🚀 Iniciando buildProjAlias...');
+
     // Read package.json
-    const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+    const packageJsonPath = 'package.json';
+    log.info(`📖 Lendo: ${packageJsonPath}`);
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
     const { dist: distPath, artifact: artifactPath } = packageJson.path;
 
-    // Create directories if they don't exist
+    // Create dist directory
     if (!fs.existsSync(distPath)) {
       fs.mkdirSync(distPath, { recursive: true });
+      log.info(`📁 Diretório 'dist' criado: ${distPath}`);
+    } else {
+      log.info(`✅ Diretório 'dist' já existe: ${distPath}`);
     }
+
+    // Create artifact directory
     if (!fs.existsSync(artifactPath)) {
       fs.mkdirSync(artifactPath, { recursive: true });
+      log.info(`📁 Diretório 'artifact' criado: ${artifactPath}`);
+    } else {
+      log.info(`✅ Diretório 'artifact' já existe: ${artifactPath}`);
     }
 
-    // Copy test/extension to dist directory
-    copyDirectory('test/extension', distPath);
+    // Copy test/extension to dist
+    log.info('📤 Copiando extensão para dist...');
+    copyDirectory('test/extension', distPath, log);
 
-    // Copy web-ext-artifacts to artifact directory
-    copyDirectory('web-ext-artifacts', artifactPath);
+    // Copy web-ext-artifacts to artifact
+    log.info('📤 Copiando artefatos web-ext para artifact...');
+    copyDirectory('web-ext-artifacts', artifactPath, log);
 
-    // Read manifest.json from the copied dist directory
+    // Read manifest.json
     const manifestPath = path.join(distPath, 'manifest.json');
+    log.info(`📖 Lendo manifest.json em: ${manifestPath}`);
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
 
-    // Find the zip file in the artifact directory
+    // Renomear zip
+    log.info('🔍 Procurando arquivo .zip em artifacts...');
     const files = fs.readdirSync(artifactPath);
     const zipFile = files.find((file) => file.endsWith('.zip'));
 
@@ -52,20 +84,23 @@ export const buildProjAlias = async () => {
         `${manifest.name}(chrome)-${manifest.version}.zip`.replace(
           /[<>:"/\\|?*]/g,
           '-'
-        ); // Replace invalid characters
+        );
       const oldPath = path.join(artifactPath, zipFile);
       const newPath = path.join(artifactPath, newFileName);
 
-      // Rename the zip file
       fs.renameSync(oldPath, newPath);
-      console.log(`Successfully renamed zip file to: ${newFileName}`);
+      log.info(`✅ Arquivo renomeado: ${zipFile} ➡️ ${newFileName}`);
     } else {
-      console.error('No zip file found in artifacts directory');
+      log.warn?.(
+        '⚠️ Nenhum arquivo .zip encontrado no diretório de artefatos.'
+      );
     }
 
-    console.log('Deployment setup completed successfully!');
+    log.info('✅ Setup de deployment finalizado com sucesso!');
   } catch (error) {
-    console.error('Error during deployment setup:', error);
-    throw error; // Lançar o erro em vez de encerrar o processo
+    log.error?.('❌ Erro durante o setup de deployment:');
+    if (error instanceof Error) log.error?.(error.message);
+    else log.error?.('Erro desconhecido');
+    throw error;
   }
 };

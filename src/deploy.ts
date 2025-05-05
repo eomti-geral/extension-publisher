@@ -94,7 +94,8 @@ async function deploy() {
     );
   }
 
-  if (noProjecProvided) buildProjAlias();
+  console.log('Deploy executando em modo "no-project"');
+  if (noProjecProvided) buildProjAlias(p.log);
 
   // Ler o manifest.json da extensão
   let manifest: Record<string, unknown>;
