@@ -74,28 +74,6 @@ export const buildProjAlias = async (log: {
     log.info(`📖 Lendo manifest.json em: ${manifestPath}`);
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
 
-    // Renomear zip
-    log.info('🔍 Procurando arquivo .zip em artifacts...');
-    const files = fs.readdirSync(artifactPath);
-    const zipFile = files.find((file) => file.endsWith('.zip'));
-
-    if (zipFile) {
-      const newFileName =
-        `${manifest.name}(chrome)-${manifest.version}.zip`.replace(
-          /[<>:"/\\|?*]/g,
-          '-'
-        );
-      const oldPath = path.join(artifactPath, zipFile);
-      const newPath = path.join(artifactPath, newFileName);
-
-      fs.renameSync(oldPath, newPath);
-      log.info(`✅ Arquivo renomeado: ${zipFile} ➡️ ${newFileName}`);
-    } else {
-      log.warn?.(
-        '⚠️ Nenhum arquivo .zip encontrado no diretório de artefatos.'
-      );
-    }
-
     log.info('✅ Setup de deployment finalizado com sucesso!');
   } catch (error) {
     log.error?.('❌ Erro durante o setup de deployment:');

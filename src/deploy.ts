@@ -123,7 +123,9 @@ async function deploy() {
         };
 
         manifest = await readManifest(projectFolder, log);
-        artifactName = `${manifest.name}(chrome)-${manifest.version}.zip`;
+        artifactName = !noProjecProvided
+          ? `${manifest.name}(chrome)-${manifest.version}.zip`
+          : 'live-test.zip';
         const artifactPath = resolve(
           projectFolder,
           projExtArtifactPath,
@@ -281,7 +283,7 @@ async function deploy() {
     {
       title: 'Publicando extensão',
       id: 'publicar-extensao',
-      enabled: false,
+      enabled: true,
       dependsOn: [{ id: 'fazer-upload', successStatus: true }],
 
       async task() {
