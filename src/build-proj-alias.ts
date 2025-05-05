@@ -72,7 +72,6 @@ export const buildProjAlias = async (log: {
     // Read manifest.json
     const manifestPath = path.join(distPath, 'manifest.json');
     log.info(`📖 Lendo manifest.json em: ${manifestPath}`);
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
 
     log.info('✅ Setup de deployment finalizado com sucesso!');
   } catch (error) {
