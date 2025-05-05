@@ -11,6 +11,11 @@ jobs:
   test:
     name: Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
+    env:
+      GOOGLE_CLOUD_API_CLIENT_ID: ${{ vars.GOOGLE_CLOUD_API_CLIENT_ID }}
+      GOOGLE_CLOUD_API_CLIENT_SECRET: ${{ vars.GOOGLE_CLOUD_API_CLIENT_SECRET }}
+      GOOGLE_CLOUD_API_REFRESH_TOKEN: ${{ vars.GOOGLE_CLOUD_API_REFRESH_TOKEN }}
+      EXTENSION_ARTIFACT_ID: ${{ vars.EXTENSION_ARTIFACT_ID }}
     strategy:
       fail-fast: false
       matrix:
