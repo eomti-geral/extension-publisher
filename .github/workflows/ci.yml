@@ -62,4 +62,5 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npm run bundle
-      - run: npm run deploy --verbose --no-project
+      #- run: npm run deploy
+      - run: npm run deploy:no-project

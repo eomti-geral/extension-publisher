@@ -25,6 +25,7 @@
     "key-getter:dev": "esno ./dist/key-getter.js --dev",
     "deploy": "esno ./src/deploy.ts",
     "deploy:verbose": "esno ./src/deploy.ts --verbose",
+    "deploy:no-project": "esno ./src/deploy.ts --verbose --no-project",
     "test": "npx vitest run --exclude \"test/ci-cd/**\" && tsc",
     "test:fetch-token-live": "npx vitest test/ci-cd/fetch-token-live.spec.ts",
     "test:publish-live": "npm run bundle && npx vitest test/ci-cd/publish-live.spec.ts",

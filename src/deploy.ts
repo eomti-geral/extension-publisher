@@ -19,6 +19,7 @@ const adiar = (ms = 1500) => new Promise((resolve) => setTimeout(resolve, ms));
 // Verificar se o modo verbose está ativado
 const isVerbose = process.argv.includes('--verbose');
 const noProjecProvided = process.argv.includes('--no-project');
+console.log(process.argv);
 
 function log(message: string, data?: unknown) {
   if (isVerbose) {
@@ -94,8 +95,10 @@ async function deploy() {
     );
   }
 
-  console.log('Deploy executando em modo "no-project"');
-  if (noProjecProvided) buildProjAlias(p.log);
+  if (noProjecProvided) {
+    buildProjAlias(p.log);
+    log('Deploy executando em modo "no-project"');
+  }
 
   // Ler o manifest.json da extensão
   let manifest: Record<string, unknown>;
@@ -278,6 +281,7 @@ async function deploy() {
     {
       title: 'Publicando extensão',
       id: 'publicar-extensao',
+      enabled: false,
       dependsOn: [{ id: 'fazer-upload', successStatus: true }],
 
       async task() {
