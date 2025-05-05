@@ -53,6 +53,7 @@ jobs:
       GOOGLE_CLOUD_API_CLIENT_SECRET: ${{ secrets.GOOGLE_CLOUD_API_CLIENT_SECRET }}
       GOOGLE_CLOUD_API_REFRESH_TOKEN: ${{ secrets.GOOGLE_CLOUD_API_REFRESH_TOKEN }}
       EXTENSION_ARTIFACT_ID: ${{ vars.EXTENSION_ARTIFACT_ID }}
+      EXTENSION_PROJECT_FOLDER: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -21,9 +21,6 @@ const copyDirectory = (source: string, destination: string) => {
 
 const main = async () => {
   try {
-    // fake env var
-    process.env.EXTENSION_PROJECT_FOLDER = '.';
-
     // Read package.json
     const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
     const { dist: distPath, artifact: artifactPath } = packageJson.path;
