@@ -1,0 +1,42 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  NODE_ENV: production
+
+default:
+  image: node:22
+
+before_script:
+  - npm install
+
+build:
+  stage: build
+  script:
+    - echo "Build iniciado com Node.js $(node -v)"
+    - npm run build
+    - echo "Build concluído"
+
+test:
+  stage: test
+  parallel:
+    matrix:
+      - NODE_VERSION: "22"
+      - NODE_VERSION: "20"
+      - NODE_VERSION: "18"
+  image: node:${NODE_VERSION}
+  script:
+    - echo "Rodando testes em Node.js $NODE_VERSION"
+    - npm test
+    - npm run test:ci-cd
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Iniciando deploy..."
+    - npm run deploy:pre:proj-alias
+    - npm run deploy:verbose
+  only:
+    - main
