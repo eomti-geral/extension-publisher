@@ -1,17 +1,20 @@
 # Ferramenta de Deploy de Extensão Chrome
 
-Uma ferramenta CLI robusta para automatizar o deploy de extensões Chrome na Chrome Web Store. Este projeto oferece uma forma simplificada de gerenciar autenticação, upload e publicação de extensões Chrome de forma programática.
+Uma ferramenta robusta para automatizar o deploy de extensões Chrome na Chrome Web Store. Este projeto oferece uma forma simplificada de gerenciar autenticação, upload e publicação de extensões Chrome de forma programática. Esta ferramenta possui uma CLI que auxilia na geração e obtenção de credeciais da API Google.
 
 ## Visão Geral do Projeto
 
-Esta ferramenta simplifica o processo de deploy de extensões Chrome ao gerenciar o fluxo de autenticação com as APIs do Google Cloud e o processo de upload/publicação na Chrome Web Store. É particularmente útil para pipelines de CI/CD e cenários de deploy automatizado.
+Esta ferramenta simplifica o processo de deploy de extensões Chrome ao gerenciar o fluxo de autenticação com as APIs do Google Cloud e o processo de upload/publicação na Chrome Web Store. É particularmente útil para pipelines de CI/CD e cenários de deploy automatizado. Pro deploy ser realizado por completo, configure o ambiente para usufruir de todos os recursos.
+
+Ao executar a CLI, as variáveis específicas no arquivo `.env` serão enviados para o repositório GitLab configurado.
 
 ## Começando
 
 1. Configure seu Projeto Google Cloud e habilite a API da Chrome Web Store. (Veja os projetos baseados para realizar a configuração )
-2. Configure seu arquivo `.env` com as credenciais necessárias
+2. Configure seu arquivo `.env` com as credenciais  e variáveis necessárias
 3. Execute o key-getter para obter e armazenar seu token de atualização
-4. Use o script principal de deploy para fazer upload e publicar sua extensão
+4. Crie uma extensão rascunho em sua conta de desenvolver na Chrome Web Store
+5. Use o script principal de deploy para localmente fazer upload e publicar sua extensão
 
 Para documentação detalhada da API e uso avançado, consulte o código fonte no diretório `src`.
 
@@ -86,7 +89,7 @@ O sistema possui um robusto mecanismo de tratamento de falhas que identifica sit
 Para debugging e acompanhamento detalhado, o deploy pode ser executado em modo verbose:
 
 ```bash
-deploy --verbose
+   esno src/deploy.ts --verbose
 ```
 
 Este modo apresenta informações detalhadas sobre:
@@ -95,6 +98,16 @@ Este modo apresenta informações detalhadas sobre:
 - Conteúdo relevante do manifest.json
 - Resultados detalhados de cada operação
 - Logs de erro em caso de falha
+
+### Modo No Project
+
+Use o modo no project para executar os recursos deste repositório sem a necessidade de referenciar diretamente o projeto de extensão principal a que se está pretentando desenvolver.
+
+```bash
+   esno src/deploy.ts --no-project
+```
+
+Este usará a extensão de testes do projeto como arquivo compactado para o envio ao web store.
 
 ### Tempo de Execução
 
@@ -128,6 +141,12 @@ Utilize o utilitário key-getter em uma IDE para ser atualizado automaticamente 
 
 ```env
 GOOGLE_CLOUD_API_REFRESH_TOKEN
+```
+
+Para deploy, recomenda-se salvar a id da extensão junto a web store como uma variável CI/CD, contudo, de outro modo, para executar o `deploy` a variável abaixo poderá estar estabelecida de outra forma para o script.
+
+```env
+EXTENSION_ARTIFACT_ID
 ```
 
 ## Utilitário Key-Getter
@@ -164,25 +183,6 @@ EXTENSION_ARTIFACT_ID=id_da_sua_extensao
 EXTENSION_PROJECT_FOLDER=caminho_relativo_para_projeto_extensao
 ```
 
-### Explicação das Variáveis de Ambiente
-
-#### Credenciais da API do Google Cloud
-
-- `GOOGLE_CLOUD_API_CLIENT_ID`: ID do cliente OAuth 2.0 do seu Projeto Google Cloud
-- `GOOGLE_CLOUD_API_CLIENT_SECRET`: Chave secreta do cliente OAuth 2.0 do seu Projeto Google Cloud
-  - Estas credenciais são obtidas no Console do Google Cloud em APIs & Serviços > Credenciais
-
-#### Configuração do GitLab
-
-- `GIT_LAB_ACCESS_TOKEN`: Token de acesso pessoal para autenticação na API do GitLab
-- `GIT_LAB_PROJECT_ID`: O ID numérico do seu projeto no GitLab
-  - Estes são usados para armazenar o token de atualização com segurança no seu projeto GitLab
-
-#### Detalhes da Extensão
-
-- `EXTENSION_ARTIFACT_ID`: O ID da sua extensão Chrome na Chrome Web Store
-- `EXTENSION_PROJECT_FOLDER`: O caminho relativo para o diretório raiz da sua extensão
-
 ### Usando o Key-Getter
 
 O utilitário key-getter pode ser executado em dois modos:
@@ -216,6 +216,25 @@ key-getter
 > - Uma vez obtido, o token é armazenado com segurança e pode ser usado nos processos automatizados
 >
 > **NÃO TENTE** incluir este utilitário em pipelines automatizados ou scripts não interativos. É esperado que a pipeline CI/CD requisite uma intervenção manual para atualização do refresh token para execução da tarefa de deploy
+
+### Explicação das Variáveis de Ambiente
+
+#### Credenciais da API do Google Cloud
+
+- `GOOGLE_CLOUD_API_CLIENT_ID`: ID do cliente OAuth 2.0 do seu Projeto Google Cloud
+- `GOOGLE_CLOUD_API_CLIENT_SECRET`: Chave secreta do cliente OAuth 2.0 do seu Projeto Google Cloud
+  - Estas credenciais são obtidas no Console do Google Cloud em APIs & Serviços > Credenciais
+
+#### Configuração do GitLab
+
+- `GIT_LAB_ACCESS_TOKEN`: Token de acesso pessoal para autenticação na API do GitLab
+- `GIT_LAB_PROJECT_ID`: O ID numérico do seu projeto no GitLab
+  - Estes são usados para armazenar o token de atualização com segurança no seu projeto GitLab
+
+#### Detalhes da Extensão
+
+- `EXTENSION_ARTIFACT_ID`: O ID da sua extensão Chrome na Chrome Web Store
+- `EXTENSION_PROJECT_FOLDER`: O caminho relativo para o diretório raiz da sua extensão. Se utilizado o modo `--no-project` para o `deploy`, esta variável poderá ser omitida.
 
 ## Requisitos para Extensão de Teste em Testes Unitários
 
