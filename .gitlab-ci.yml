@@ -58,6 +58,11 @@ deploy:
     EXTENSION_ARTIFACT_ID: "$EXTENSION_ARTIFACT_ID"
     #EXTENSION_PROJECT_FOLDER=..\..\
 
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_COMMIT_TAG'
+      when: always
+    - when: never
+
   script:
     # para produção
     # - echo "Iniciando deploy..."
@@ -73,5 +78,7 @@ deploy:
     - pnpm bundle
     - pnpm esno ./src/deploy.ts --verbose --no-project --no-publish
     
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_COMMIT_TAG'
+      when: always
+    - when: never
