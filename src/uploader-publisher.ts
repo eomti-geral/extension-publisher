@@ -73,6 +73,10 @@ function throwIfNotOk(request: Response, response: unknown) {
   if (!request.ok) {
     const error = new Error(request.statusText ?? 'Unknown error');
     (error as any).response = response;
+    console.error({
+      request,
+      response
+    })
     throw error;
   }
 }

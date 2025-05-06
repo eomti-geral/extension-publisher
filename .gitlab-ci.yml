@@ -1,31 +1,30 @@
 stages:
   - build
   - test
+  - test-ci-cd
   - deploy
 
 variables:
   NODE_ENV: production
-  GOOGLE_CLOUD_API_CLIENT_ID: $GOOGLE_CLOUD_API_CLIENT_ID
-  GOOGLE_CLOUD_API_CLIENT_SECRET: $GOOGLE_CLOUD_API_CLIENT_SECRET
-  GOOGLE_CLOUD_API_REFRESH_TOKEN: $GOOGLE_CLOUD_API_REFRESH_TOKEN
-  EXTENSION_ARTIFACT_ID: $EXTENSION_ARTIFACT_ID
-  EXTENSION_PROJECT_FOLDER: .
 
 default:
   image: node:22
-  before_script:
-    - npm install
+
+before_script:
+  - corepack enable
+  - corepack prepare pnpm@latest --activate
+  - pnpm install
 
 build:
   stage: build
   script:
-    - echo "Build concluído" # Substitua por um build real se necessário
-  only:
-    changes:
-      - "**/*"
+    - echo "Build iniciado com Node.js $(node -v)"
+    - pnpm build
+    - echo "Build concluído"
 
 test:
   stage: test
+  needs: [build]
   parallel:
     matrix:
       - NODE_VERSION: "22"
@@ -33,20 +32,46 @@ test:
       - NODE_VERSION: "18"
   image: node:${NODE_VERSION}
   script:
-    - npm test
-    - npm run test:ci-cd
-  only:
-    changes:
-      - "**/*"
+    - echo "Rodando testes em Node.js $NODE_VERSION"
+    - pnpm test
+
+test-ci-cd:
+  stage: test-ci-cd
+  needs: [test]
+  image: node:20
+  variables:
+    GOOGLE_CLOUD_API_REFRESH_TOKEN: "$GOOGLE_CLOUD_API_REFRESH_TOKEN"
+    GOOGLE_CLOUD_API_CLIENT_SECRET: "$GOOGLE_CLOUD_API_CLIENT_SECRET"
+    GOOGLE_CLOUD_API_CLIENT_ID: "$GOOGLE_CLOUD_API_CLIENT_ID"
+    EXTENSION_ARTIFACT_ID: "$EXTENSION_ARTIFACT_ID"
+  script:
+    - echo "Rodando testes pré deploy CI/CD em Node.js 20"
+    - pnpm test:ci-cd
 
 deploy:
   stage: deploy
+  needs: [test-ci-cd]
+  variables:
+    GOOGLE_CLOUD_API_REFRESH_TOKEN: "$GOOGLE_CLOUD_API_REFRESH_TOKEN"
+    GOOGLE_CLOUD_API_CLIENT_SECRET: "$GOOGLE_CLOUD_API_CLIENT_SECRET"
+    GOOGLE_CLOUD_API_CLIENT_ID: "$GOOGLE_CLOUD_API_CLIENT_ID"
+    EXTENSION_ARTIFACT_ID: "$EXTENSION_ARTIFACT_ID"
+    #EXTENSION_PROJECT_FOLDER=..\..\
+
   script:
-    - npm run build
-    - npm run bundle
-    # - npm run deploy
-    - npm run deploy:no-project
+    # para produção
+    # - echo "Iniciando deploy..."
+    # - pnpm deploy
+
+    # para desenvolvimento modo no project
+    # - echo "Iniciando deploy em modo no-project..."
+    # - pnpm bundle
+    # - pnpm deploy:no-project
+
+    # para desenvolvimento sem enviar para publicação
+    - echo "Iniciando deploy em modo no-project e no-publish..."
+    - pnpm bundle
+    - pnpm esno ./src/deploy.ts --verbose --no-project --no-publish
+    
   only:
-    - main
-  except:
-    - "*.md"
+    - master

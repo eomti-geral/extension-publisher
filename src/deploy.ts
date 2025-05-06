@@ -19,7 +19,7 @@ const adiar = (ms = 1500) => new Promise((resolve) => setTimeout(resolve, ms));
 // Verificar se o modo verbose está ativado
 const isVerbose = process.argv.includes('--verbose');
 const noProjecProvided = process.argv.includes('--no-project');
-console.log(process.argv);
+const publishEnabled = !process.argv.includes('--no-publish');
 
 function log(message: string, data?: unknown) {
   if (isVerbose) {
@@ -283,7 +283,7 @@ async function deploy() {
     {
       title: 'Publicando extensão',
       id: 'publicar-extensao',
-      enabled: true,
+      enabled: publishEnabled,
       dependsOn: [{ id: 'fazer-upload', successStatus: true }],
 
       async task() {
@@ -424,9 +424,16 @@ async function deploy() {
     await adiar(); // Simular tempo de espera entre as tasks
   }
 
-  if (tasks.find((t) => t.id === 'publicar-extensao')?.success)
+  if (!publishEnabled){
+    p.log.warn('A publicação deverá ser realizada manualmente.');
     p.outro('✨ Deploy realizado com sucesso!');
-  else p.outro('❌ Deploy falhou! Verifique os logs para mais detalhes.');
+  }
+  else if (tasks.find((t) => t.id === 'publicar-extensao')?.success)
+    p.outro('✨ Deploy realizado com sucesso!');
+  else { 
+    p.outro('❌ Deploy falhou! Verifique os logs para mais detalhes.'); 
+    process.exit(1)
+  }
 }
 
 // Executar o deploy

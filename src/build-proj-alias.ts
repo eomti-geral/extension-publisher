@@ -73,6 +73,19 @@ export const buildProjAlias = async (log: {
     const manifestPath = path.join(distPath, 'manifest.json');
     log.info(`📖 Lendo manifest.json em: ${manifestPath}`);
 
+    // Procurar arquivo .zip
+    log.info('🔍 Procurando arquivo .zip em artifacts...');
+    const files = fs.readdirSync(artifactPath);
+    const zipFile = files.find((file: string) => file.endsWith('.zip'));
+
+    if (zipFile) {
+      log.info(`✅ Arquivo .zip encontrado: ${zipFile}`);
+    } else {
+      log.warn?.(
+        '⚠️ Nenhum arquivo .zip encontrado no diretório de artefatos.'
+      );
+    }
+
     log.info('✅ Setup de deployment finalizado com sucesso!');
   } catch (error) {
     log.error?.('❌ Erro durante o setup de deployment:');

@@ -109,6 +109,14 @@ Use o modo no project para executar os recursos deste repositório sem a necessi
 
 Este usará a extensão de testes do projeto como arquivo compactado para o envio ao web store.
 
+### Deploy sem publicação automática
+
+Use o argumento da linha de comando do `deploy` para desabilitar a publicação automática após o envio da extensão caso pretenda garantir que publique manualmente na web store do Google Chrome
+
+```bash
+   esno src/deploy.ts --no-publish
+```
+
 ### Tempo de Execução
 
 O processo inclui intervalos estratégicos entre as operações para garantir a correta sincronização com a API da Chrome Web Store. O tempo total de execução pode variar dependendo de:
